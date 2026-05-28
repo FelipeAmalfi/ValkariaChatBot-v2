@@ -1,0 +1,13 @@
+{
+  "name": "@valkaria/chat-service",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build":     "tsc",
+    "typecheck": "tsc --noEmit",
+    "dev":       "tsx watch src/index.ts",
+    "start":     "node dist/index.js",
+    "test":      "vitest run",
+    "graph:dev": "tsx src/interface/graph/repl.ts"
+  }
+}

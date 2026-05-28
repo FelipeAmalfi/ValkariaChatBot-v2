@@ -1,0 +1,25 @@
+{
+  "name": "@valkaria/database",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build":     "tsc",
+    "typecheck": "tsc --noEmit",
+    "dev":       "tsc --watch",
+    "migrate":   "tsx src/migrate.ts"
+  },
+  "dependencies": {
+    "pg": "^8.13.0",
+    "pgvector": "^0.2.0",
+    "neo4j-driver": "^5.27.0",
+    "ioredis": "^5.4.0",
+    "@valkaria/domain": "*",
+    "@valkaria/config": "*"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.0",
+    "typescript": "*",
+    "tsx": "^4.19.0"
+  }
+}
