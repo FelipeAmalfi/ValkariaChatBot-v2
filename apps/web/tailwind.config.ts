@@ -38,6 +38,9 @@ const config: Config = {
         parchment:'#e8d5a3',
         gold:     '#c9a84c',
         ember:    '#8b1a1a',
+        silver:   '#b8a8c8',
+        sage:     '#7a9e7e',
+        'gold-dim': '#8a6a2a',
         // shadcn CSS variable mappings
         background: 'hsl(var(--background))',
         foreground:  'hsl(var(--foreground))',
