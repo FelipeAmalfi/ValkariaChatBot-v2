@@ -22,6 +22,11 @@ export const ValkáriaStateAnnotation = Annotation.Root({
   plannerPlan:       Annotation<PlannerPlan | undefined>({ reducer: (_, n) => n, default: () => undefined }),
   aggregatedContext: Annotation<string | undefined>({ reducer: (_, n) => n, default: () => undefined }),
 
+  retrievedContext:  Annotation<string | null>({ reducer: (_, n) => n, default: () => null }),
+  graphContext:      Annotation<string | undefined>({ reducer: (_, n) => n, default: () => undefined }),
+  cypherQueries:     Annotation<string[]>({ reducer: (_, n) => n, default: () => [] }),
+  cypherResults:     Annotation<unknown[]>({ reducer: (_, n) => n, default: () => [] }),
+
   lastCypherQueries: Annotation<Array<{ cypher: string; purpose: string }> | undefined>({ reducer: (_, n) => n, default: () => undefined }),
   lastCypherError:   Annotation<string | undefined>({ reducer: (_, n) => n, default: () => undefined }),
   cypherRetryCount:  Annotation<number>({ reducer: (_, n) => n, default: () => 0 }),
