@@ -1,7 +1,7 @@
 import { Annotation } from '@langchain/langgraph'
 import type { Intent, Slots, Complexity } from '../../shared/prompts/v1/identifyIntent.js'
 import type { PlannerPlan } from '../../shared/prompts/v1/generatePlan.js'
-import type { PlayerRole, SessionContext } from '@valkaria/domain'
+import type { PlayerRole, SessionContext, AffinitySnapshot } from '@valkaria/domain'
 
 export const ValkáriaStateAnnotation = Annotation.Root({
   message: Annotation<string>({ reducer: (_, n) => n, default: () => '' }),
@@ -30,6 +30,9 @@ export const ValkáriaStateAnnotation = Annotation.Root({
   lastCypherQueries: Annotation<Array<{ cypher: string; purpose: string }> | undefined>({ reducer: (_, n) => n, default: () => undefined }),
   lastCypherError:   Annotation<string | undefined>({ reducer: (_, n) => n, default: () => undefined }),
   cypherRetryCount:  Annotation<number>({ reducer: (_, n) => n, default: () => 0 }),
+
+  affinitySnapshot:    Annotation<AffinitySnapshot[]>({ reducer: (_, n) => n, default: () => [] }),
+  recommendationContext: Annotation<string | undefined>({ reducer: (_, n) => n, default: () => undefined }),
 
   response:            Annotation<string | undefined>({ reducer: (_, n) => n, default: () => undefined }),
   retrievalError:      Annotation<string | undefined>({ reducer: (_, n) => n, default: () => undefined }),

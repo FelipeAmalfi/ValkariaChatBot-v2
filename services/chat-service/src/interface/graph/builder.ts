@@ -6,6 +6,7 @@ import {
   routeAfterSanitize,
   routeAfterIntent,
   routeAfterCypherExecute,
+  routeAfterPlanner,
 } from './router.js'
 import { sanitizeNode } from './nodes/sanitizeNode.js'
 import { identifyIntentNode } from './nodes/identifyIntentNode.js'
@@ -14,6 +15,12 @@ import { simpleRetrievalNode } from './nodes/simpleRetrievalNode.js'
 import { graphRetrievalNode } from './nodes/graphRetrievalNode.js'
 import { cypherGenerateNode } from './nodes/cypherGenerateNode.js'
 import { cypherExecuteNode } from './nodes/cypherExecuteNode.js'
+import { plannerNode } from './nodes/plannerNode.js'
+import { retrievalOrchestratorNode } from './nodes/retrievalOrchestratorNode.js'
+import { affinityNode } from './nodes/affinityNode.js'
+import { recommendationNode } from './nodes/recommendationNode.js'
+import { feedbackNode } from './nodes/feedbackNode.js'
+import { memoryNode } from './nodes/memoryNode.js'
 import type { GraphDependencies } from './dependencies.js'
 
 function withDeps(
@@ -30,18 +37,23 @@ export function buildValkáriaGraph(
   const graph = new StateGraph(ValkáriaStateAnnotation)
 
   graph
-    .addNode('sanitize',         sanitizeNode())
-    .addNode('identifyIntent',   identifyIntentNode(deps))
-    .addNode('sessionLoad',      sessionLoadNode(deps))
-    .addNode('simpleRetrieval',  withDeps(simpleRetrievalNode, deps))
-    .addNode('graphRetrieval',   withDeps(graphRetrievalNode, deps))
-    .addNode('cypherGenerate',   withDeps(cypherGenerateNode, deps))
-    .addNode('cypherExecute',    withDeps(cypherExecuteNode, deps))
-    .addNode('planner',          async () => ({}))  // Phase 09 stub
+    .addNode('sanitize',               sanitizeNode())
+    .addNode('identifyIntent',         identifyIntentNode(deps))
+    .addNode('sessionLoad',            sessionLoadNode(deps))
+    .addNode('simpleRetrieval',        withDeps(simpleRetrievalNode, deps))
+    .addNode('graphRetrieval',         withDeps(graphRetrievalNode, deps))
+    .addNode('cypherGenerate',         withDeps(cypherGenerateNode, deps))
+    .addNode('cypherExecute',          withDeps(cypherExecuteNode, deps))
+    .addNode('planner',                withDeps(plannerNode, deps))
+    .addNode('retrievalOrchestrator',  withDeps(retrievalOrchestratorNode, deps))
+    .addNode('affinityNode',           withDeps(affinityNode, deps))
+    .addNode('recommendationNode',     withDeps(recommendationNode, deps))
+    .addNode('feedbackNode',           withDeps(feedbackNode, deps))
+    .addNode('memoryNode',             withDeps(memoryNode, deps))
     .addNode('narrativeResponse', async (state) => ({
-      response: `[Phase 08 stub] Context: ${state.retrievedContext ?? state.graphContext ?? 'none'}`,
+      response: `[Phase 09 stub] Context: ${state.retrievedContext ?? state.graphContext ?? state.recommendationContext ?? 'none'}`,
     }))
-    .addNode('turnPersistence',  async () => ({}))
+    .addNode('turnPersistence', async () => ({}))
 
     .addEdge(START, 'sanitize')
     .addConditionalEdges('sanitize', routeAfterSanitize, {
@@ -50,22 +62,34 @@ export function buildValkáriaGraph(
     })
     .addEdge('identifyIntent', 'sessionLoad')
     .addConditionalEdges('sessionLoad', routeAfterIntent, {
-      simpleRetrieval:  'simpleRetrieval',
-      graphRetrieval:   'graphRetrieval',
-      cypherGenerate:   'cypherGenerate',
-      planner:          'planner',
-      narrativeResponse: 'narrativeResponse',
+      simpleRetrieval:    'simpleRetrieval',
+      graphRetrieval:     'graphRetrieval',
+      cypherGenerate:     'cypherGenerate',
+      planner:            'planner',
+      affinityNode:       'affinityNode',
+      recommendationNode: 'recommendationNode',
+      feedbackNode:       'feedbackNode',
+      memoryNode:         'memoryNode',
+      narrativeResponse:  'narrativeResponse',
     })
-    .addEdge('simpleRetrieval', 'narrativeResponse')
-    .addEdge('graphRetrieval',  'narrativeResponse')
-    .addEdge('planner',         'narrativeResponse')
-    .addEdge('cypherGenerate',  'cypherExecute')
+    .addEdge('simpleRetrieval',       'narrativeResponse')
+    .addEdge('graphRetrieval',        'narrativeResponse')
+    .addEdge('cypherGenerate',        'cypherExecute')
     .addConditionalEdges('cypherExecute', routeAfterCypherExecute, {
-      cypherGenerate:   'cypherGenerate',
+      cypherGenerate:    'cypherGenerate',
       narrativeResponse: 'narrativeResponse',
     })
-    .addEdge('narrativeResponse', 'turnPersistence')
-    .addEdge('turnPersistence', END)
+    .addConditionalEdges('planner', routeAfterPlanner, {
+      retrievalOrchestrator: 'retrievalOrchestrator',
+      simpleRetrieval:       'simpleRetrieval',
+    })
+    .addEdge('retrievalOrchestrator', 'narrativeResponse')
+    .addEdge('affinityNode',          'narrativeResponse')
+    .addEdge('recommendationNode',    'narrativeResponse')
+    .addEdge('feedbackNode',          'turnPersistence')
+    .addEdge('memoryNode',            'turnPersistence')
+    .addEdge('narrativeResponse',     'turnPersistence')
+    .addEdge('turnPersistence',       END)
 
   return graph.compile({ checkpointer })
 }
