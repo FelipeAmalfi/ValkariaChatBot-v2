@@ -132,6 +132,7 @@ valkaria-v2/
 | 18 | Observability | all services | none (config) |
 | 19 | Testing | all | testing |
 | 20 | Deployment | CI/CD | none |
+| 21 | Documentation | docs/ | none |
 
 ---
 
