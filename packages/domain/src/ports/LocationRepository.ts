@@ -2,6 +2,7 @@ import type { Location } from '../entities/Location.js'
 
 export interface LocationRepository {
   findByName(name: string): Promise<Location | null>
+  findById(id: string): Promise<Location | null>
   findMany(filters?: {
     page?: number
     pageSize?: number

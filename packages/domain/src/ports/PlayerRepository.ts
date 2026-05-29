@@ -3,6 +3,7 @@ import type { Player } from '../entities/Player.js'
 export interface PlayerRepository {
   findByName(name: string): Promise<Player | null>
   findById(id: string): Promise<Player | null>
+  findMany(filters?: { page?: number; pageSize?: number }): Promise<Player[]>
   create(player: Omit<Player, 'id' | 'createdAt' | 'updatedAt'>): Promise<Player>
   update(id: string, partial: Partial<Omit<Player, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Player>
 }

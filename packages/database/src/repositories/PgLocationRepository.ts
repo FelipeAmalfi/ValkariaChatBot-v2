@@ -23,6 +23,14 @@ export class PgLocationRepository implements LocationRepository {
     return rows[0] ? toLocation(rows[0]) : null
   }
 
+  async findById(id: string): Promise<Location | null> {
+    const { rows } = await this.pool.query(
+      'SELECT * FROM locations WHERE id = $1',
+      [id]
+    )
+    return rows[0] ? toLocation(rows[0]) : null
+  }
+
   async findMany(filters?: { page?: number; pageSize?: number }): Promise<Location[]> {
     const page = filters?.page ?? 1
     const pageSize = filters?.pageSize ?? 20
