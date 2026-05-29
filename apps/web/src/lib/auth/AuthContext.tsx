@@ -6,6 +6,9 @@ interface Player {
   name: string
   class: string
   race: string
+  background?: string
+  personality?: string
+  interests?: string
 }
 
 interface AuthState {

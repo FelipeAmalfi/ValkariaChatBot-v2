@@ -23,6 +23,14 @@ export function Navbar() {
             >
               Mundo
             </Link>
+            {!isDM && (
+              <Link
+                href="/profile"
+                className="text-sm text-parchment/80 hover:text-parchment transition-colors"
+              >
+                Perfil
+              </Link>
+            )}
           </div>
         )}
 

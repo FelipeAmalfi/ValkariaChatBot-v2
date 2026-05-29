@@ -41,6 +41,9 @@ export const VERIFY_AUTH = gql`
         name
         class
         race
+        background
+        personality
+        interests
       }
     }
   }
