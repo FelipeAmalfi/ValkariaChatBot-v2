@@ -11,6 +11,7 @@ import {
 import { sanitizeNode } from './nodes/sanitizeNode.js'
 import { identifyIntentNode } from './nodes/identifyIntentNode.js'
 import { sessionLoadNode } from './nodes/sessionLoadNode.js'
+import { identityFlowNode } from './nodes/identityFlowNode.js'
 import { simpleRetrievalNode } from './nodes/simpleRetrievalNode.js'
 import { graphRetrievalNode } from './nodes/graphRetrievalNode.js'
 import { cypherGenerateNode } from './nodes/cypherGenerateNode.js'
@@ -21,6 +22,8 @@ import { affinityNode } from './nodes/affinityNode.js'
 import { recommendationNode } from './nodes/recommendationNode.js'
 import { feedbackNode } from './nodes/feedbackNode.js'
 import { memoryNode } from './nodes/memoryNode.js'
+import { narrativeResponseNode } from './nodes/narrativeResponseNode.js'
+import { turnPersistenceNode } from './nodes/turnPersistenceNode.js'
 import type { GraphDependencies } from './dependencies.js'
 
 function withDeps(
@@ -40,6 +43,7 @@ export function buildValkáriaGraph(
     .addNode('sanitize',               sanitizeNode())
     .addNode('identifyIntent',         identifyIntentNode(deps))
     .addNode('sessionLoad',            sessionLoadNode(deps))
+    .addNode('identityFlow',           withDeps(identityFlowNode, deps))
     .addNode('simpleRetrieval',        withDeps(simpleRetrievalNode, deps))
     .addNode('graphRetrieval',         withDeps(graphRetrievalNode, deps))
     .addNode('cypherGenerate',         withDeps(cypherGenerateNode, deps))
@@ -50,10 +54,8 @@ export function buildValkáriaGraph(
     .addNode('recommendationNode',     withDeps(recommendationNode, deps))
     .addNode('feedbackNode',           withDeps(feedbackNode, deps))
     .addNode('memoryNode',             withDeps(memoryNode, deps))
-    .addNode('narrativeResponse', async (state) => ({
-      response: `[Phase 09 stub] Context: ${state.retrievedContext ?? state.graphContext ?? state.recommendationContext ?? 'none'}`,
-    }))
-    .addNode('turnPersistence', async () => ({}))
+    .addNode('narrativeResponse',      withDeps(narrativeResponseNode, deps))
+    .addNode('turnPersistence',        withDeps(turnPersistenceNode, deps))
 
     .addEdge(START, 'sanitize')
     .addConditionalEdges('sanitize', routeAfterSanitize, {
@@ -62,6 +64,7 @@ export function buildValkáriaGraph(
     })
     .addEdge('identifyIntent', 'sessionLoad')
     .addConditionalEdges('sessionLoad', routeAfterIntent, {
+      identityFlow:       'identityFlow',
       simpleRetrieval:    'simpleRetrieval',
       graphRetrieval:     'graphRetrieval',
       cypherGenerate:     'cypherGenerate',
@@ -72,9 +75,10 @@ export function buildValkáriaGraph(
       memoryNode:         'memoryNode',
       narrativeResponse:  'narrativeResponse',
     })
-    .addEdge('simpleRetrieval',       'narrativeResponse')
-    .addEdge('graphRetrieval',        'narrativeResponse')
-    .addEdge('cypherGenerate',        'cypherExecute')
+    .addEdge('identityFlow',           'narrativeResponse')
+    .addEdge('simpleRetrieval',        'narrativeResponse')
+    .addEdge('graphRetrieval',         'narrativeResponse')
+    .addEdge('cypherGenerate',         'cypherExecute')
     .addConditionalEdges('cypherExecute', routeAfterCypherExecute, {
       cypherGenerate:    'cypherGenerate',
       narrativeResponse: 'narrativeResponse',
@@ -83,13 +87,13 @@ export function buildValkáriaGraph(
       retrievalOrchestrator: 'retrievalOrchestrator',
       simpleRetrieval:       'simpleRetrieval',
     })
-    .addEdge('retrievalOrchestrator', 'narrativeResponse')
-    .addEdge('affinityNode',          'narrativeResponse')
-    .addEdge('recommendationNode',    'narrativeResponse')
-    .addEdge('feedbackNode',          'turnPersistence')
-    .addEdge('memoryNode',            'turnPersistence')
-    .addEdge('narrativeResponse',     'turnPersistence')
-    .addEdge('turnPersistence',       END)
+    .addEdge('retrievalOrchestrator',  'narrativeResponse')
+    .addEdge('affinityNode',           'narrativeResponse')
+    .addEdge('recommendationNode',     'narrativeResponse')
+    .addEdge('feedbackNode',           'turnPersistence')
+    .addEdge('memoryNode',             'turnPersistence')
+    .addEdge('narrativeResponse',      'turnPersistence')
+    .addEdge('turnPersistence',        END)
 
   return graph.compile({ checkpointer })
 }

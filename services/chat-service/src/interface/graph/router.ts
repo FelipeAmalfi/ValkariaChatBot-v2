@@ -17,6 +17,9 @@ export function routeAfterIntent(state: ValkáriaState): string {
     case 'ask_relationship':
     case 'ask_faction':
       return 'cypherGenerate'
+    case 'identify_player':
+    case 'identify_dm':
+      return 'identityFlow'
     case 'ask_affinity':
       return 'affinityNode'
     case 'ask_memory':
