@@ -18,6 +18,7 @@
     "@valkaria/database": "*",
     "@valkaria/domain": "*",
     "fastify": "^5.2.0",
+    "fastify-plugin": "^5.1.0",
     "jsonwebtoken": "^9.0.0",
     "openai": "^4.77.0",
     "zod": "^3.25.76"

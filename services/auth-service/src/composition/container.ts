@@ -1,4 +1,6 @@
 import { getPgPool, getRedisClient, PgPlayerRepository } from '@valkaria/database'
+import type { Pool } from 'pg'
+import type Redis from 'ioredis'
 import { OpenRouterProvider } from '../infrastructure/ai/OpenRouterProvider.js'
 import { EmbeddingSemanticAuth } from '../infrastructure/auth/EmbeddingSemanticAuth.js'
 import { AuthChallengeStore } from '../infrastructure/auth/AuthChallengeStore.js'
@@ -29,7 +31,13 @@ function parseExpiryToSeconds(value: string): number {
   return n * (units[match[2]] ?? 1)
 }
 
-export function buildContainer(env: Env): AuthControllerDeps {
+export interface AuthBuildResult {
+  deps: AuthControllerDeps
+  pool: Pool
+  redis: Redis
+}
+
+export function buildContainer(env: Env): AuthBuildResult {
   const pool = getPgPool(env.DATABASE_URL)
   const redis = getRedisClient(env.REDIS_URL)
 
@@ -50,9 +58,13 @@ export function buildContainer(env: Env): AuthControllerDeps {
   const jwtService = new JwtService(env.JWT_SECRET, parseExpiryToSeconds(env.JWT_EXPIRES_IN))
 
   return {
-    registerPlayer: new RegisterPlayerUseCase(playerRepo),
-    initiatePlayerAuth: new InitiatePlayerAuthUseCase(playerRepo, semanticAuth, challengeStore),
-    validatePlayerAuth: new ValidatePlayerAuthUseCase(playerRepo, semanticAuth, challengeStore, jwtService),
-    authenticateDM: new AuthenticateDMUseCase(jwtService, env.DM_PASSWORD),
+    deps: {
+      registerPlayer: new RegisterPlayerUseCase(playerRepo),
+      initiatePlayerAuth: new InitiatePlayerAuthUseCase(playerRepo, semanticAuth, challengeStore),
+      validatePlayerAuth: new ValidatePlayerAuthUseCase(playerRepo, semanticAuth, challengeStore, jwtService),
+      authenticateDM: new AuthenticateDMUseCase(jwtService, env.DM_PASSWORD),
+    },
+    pool,
+    redis,
   }
 }

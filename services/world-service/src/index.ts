@@ -23,9 +23,9 @@ function getEnv() {
 const env = getEnv()
 const port = parseInt(env.WORLD_PORT, 10)
 
-const deps = buildContainer(env)
+const { deps, pool } = buildContainer(env)
 
-createServer(deps).then((app) => {
+createServer(deps, pool).then((app) => {
   app.listen({ port, host: '0.0.0.0' }, (err) => {
     if (err) {
       console.error(err)

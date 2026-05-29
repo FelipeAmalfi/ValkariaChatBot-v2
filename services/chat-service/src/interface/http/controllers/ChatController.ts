@@ -20,10 +20,11 @@ export function registerChatRoutes(fastify: FastifyInstance, graph: ValkáriaGra
   }, async (request, reply) => {
     const { message } = request.body
     const threadId = (request.headers['x-thread-id'] as string | undefined) ?? randomUUID()
+    const correlationId = request.correlationId ?? (request.headers['x-request-id'] as string | undefined) ?? randomUUID()
 
     const result = await graph.invoke(
       { message },
-      { configurable: { thread_id: threadId } },
+      { configurable: { thread_id: threadId, correlationId } },
     )
 
     return reply.send({

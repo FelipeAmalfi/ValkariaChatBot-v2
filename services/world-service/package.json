@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "main": "dist/index.js",
   "scripts": {
-    "build":     "tsc",
+    "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "dev":       "tsx watch src/index.ts",
-    "start":     "node dist/index.js",
-    "test":      "vitest run"
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest run"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.0",
@@ -17,6 +17,7 @@
     "@valkaria/database": "*",
     "@valkaria/domain": "*",
     "fastify": "^5.2.0",
+    "fastify-plugin": "^5.1.0",
     "graphql": "^16.0.0",
     "mercurius": "^15.0.0",
     "zod": "^3.25.76"

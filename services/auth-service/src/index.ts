@@ -33,14 +33,13 @@ function getEnv() {
 const env = getEnv()
 const port = parseInt(env.AUTH_PORT, 10)
 
-const deps = buildContainer(env)
+const { deps, pool, redis } = buildContainer(env)
 
-createServer(deps).then((app) => {
+createServer(deps, pool, redis).then((app) => {
   app.listen({ port, host: '0.0.0.0' }, (err) => {
     if (err) {
       console.error(err)
       process.exit(1)
     }
-    console.log(`auth-service listening on port ${port}`)
   })
 })

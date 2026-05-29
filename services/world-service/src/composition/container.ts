@@ -5,6 +5,7 @@ import {
   PgAffinityRepository,
   PgLocationRepository,
 } from '@valkaria/database'
+import type { Pool } from 'pg'
 import { GetCharacterUseCase } from '../application/use-cases/GetCharacterUseCase.js'
 import { ListCharactersUseCase } from '../application/use-cases/ListCharactersUseCase.js'
 import { GetLocationUseCase } from '../application/use-cases/GetLocationUseCase.js'
@@ -30,7 +31,12 @@ export interface ContainerDeps {
   locationRepo: PgLocationRepository
 }
 
-export function buildContainer(env: Env): ContainerDeps {
+export interface WorldBuildResult {
+  deps: ContainerDeps
+  pool: Pool
+}
+
+export function buildContainer(env: Env): WorldBuildResult {
   const pool = getPgPool(env.DATABASE_URL)
 
   const characterRepo = new PgCharacterRepository(pool)
@@ -39,14 +45,17 @@ export function buildContainer(env: Env): ContainerDeps {
   const locationRepo = new PgLocationRepository(pool)
 
   return {
-    getCharacter: new GetCharacterUseCase(characterRepo),
-    listCharacters: new ListCharactersUseCase(characterRepo),
-    getLocation: new GetLocationUseCase(locationRepo),
-    listLocations: new ListLocationsUseCase(locationRepo),
-    getAffinity: new GetAffinityUseCase(affinityRepo, playerRepo),
-    listAffinities: new ListAffinitiesUseCase(affinityRepo, playerRepo),
-    updateAffinity: new UpdateAffinityUseCase(affinityRepo, playerRepo),
-    listPlayers: new ListPlayersUseCase(playerRepo),
-    locationRepo,
+    deps: {
+      getCharacter: new GetCharacterUseCase(characterRepo),
+      listCharacters: new ListCharactersUseCase(characterRepo),
+      getLocation: new GetLocationUseCase(locationRepo),
+      listLocations: new ListLocationsUseCase(locationRepo),
+      getAffinity: new GetAffinityUseCase(affinityRepo, playerRepo),
+      listAffinities: new ListAffinitiesUseCase(affinityRepo, playerRepo),
+      updateAffinity: new UpdateAffinityUseCase(affinityRepo, playerRepo),
+      listPlayers: new ListPlayersUseCase(playerRepo),
+      locationRepo,
+    },
+    pool,
   }
 }
