@@ -6,3 +6,5 @@ dist/
 .next/
 coverage/
 .claude/
+docs/.vitepress/dist
+docs/.vitepress/cache

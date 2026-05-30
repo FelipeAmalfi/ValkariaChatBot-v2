@@ -12,14 +12,20 @@
     "test": "turbo test",
     "typecheck": "turbo typecheck",
     "lint": "turbo lint",
-    "migrate": "turbo migrate"
+    "migrate": "turbo migrate",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
-    "turbo": "^2.3.0",
-    "typescript": "^5.7.0",
+    "@anthropic-ai/sdk": "^0.39.0",
     "@types/node": "^22.0.0",
     "eslint": "^9.0.0",
-    "prettier": "^3.4.0"
+    "prettier": "^3.4.0",
+    "tsx": "^4.22.3",
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.0",
+    "vitepress": "^1.6.4"
   },
   "packageManager": "npm@10.9.0"
 }
