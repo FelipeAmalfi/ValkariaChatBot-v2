@@ -6,6 +6,10 @@
   "scripts": {
     "build":     "tsc",
     "typecheck": "tsc --noEmit",
-    "dev":       "tsc --watch"
+    "dev":       "tsc --watch",
+    "test":      "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
   }
 }
