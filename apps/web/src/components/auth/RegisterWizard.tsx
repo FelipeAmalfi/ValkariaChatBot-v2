@@ -1,11 +1,9 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useMutation } from '@apollo/client/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { WizardStep } from './WizardStep'
 import { StepIndicator } from './StepIndicator'
-import { REGISTER_PLAYER } from '@/lib/graphql/mutations/auth'
 
 const CLASSES = ['Guerreiro', 'Mago', 'Ladino', 'Clérigo', 'Bárbaro', 'Bardo', 'Druida', 'Paladino', 'Ranger']
 const RACES = ['Humano', 'Elfo', 'Anão', 'Halfling', 'Gnomo', 'Meio-Elfo', 'Meio-Orc', 'Tiefling', 'Draconato']
@@ -32,7 +30,7 @@ export function RegisterWizard() {
     interests: '',
   })
 
-  const [registerPlayer, { loading }] = useMutation(REGISTER_PLAYER)
+  const [loading, setLoading] = useState(false)
 
   function set<K extends keyof FormState>(key: K, value: string) {
     setForm(prev => ({ ...prev, [key]: value }))
@@ -64,25 +62,27 @@ export function RegisterWizard() {
       return
     }
 
+    setLoading(true)
     try {
-      await registerPlayer({
-        variables: {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           name: form.name,
           class: form.class,
           race: form.race,
           background: form.background,
           personality: form.personality,
           interests: form.interests,
-        },
+        }),
       })
+      if (res.status === 409) { setError('Este nome já está em uso.'); return }
+      if (!res.ok) throw new Error('error')
       router.push(`/auth/login?name=${encodeURIComponent(form.name)}`)
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e)
-      if (msg.toLowerCase().includes('conflict') || msg.toLowerCase().includes('already')) {
-        setError('Este nome já está em uso.')
-      } else {
-        setError('Erro ao criar personagem. Tente novamente.')
-      }
+    } catch {
+      setError('Erro ao criar personagem. Tente novamente.')
+    } finally {
+      setLoading(false)
     }
   }
 

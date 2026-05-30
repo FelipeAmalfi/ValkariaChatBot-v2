@@ -1,16 +1,13 @@
 import OpenAI from 'openai'
 import { AIProviderError } from '@valkaria/domain'
 import type { AIProvider, AITask, ChatMessage } from '@valkaria/domain'
-
-type ModelConfig = Record<AITask, string>
+import { ModelSelector } from '@valkaria/config'
 
 export class OpenRouterProvider implements AIProvider {
   private client: OpenAI
+  private selector: ModelSelector
 
-  constructor(
-    private apiKey: string,
-    private modelConfig: ModelConfig,
-  ) {
+  constructor(private apiKey: string) {
     this.client = new OpenAI({
       baseURL: 'https://openrouter.ai/api/v1',
       apiKey,
@@ -19,24 +16,28 @@ export class OpenRouterProvider implements AIProvider {
         'X-Title': 'Valkária RPG',
       },
     })
+    this.selector = new ModelSelector()
   }
 
   async complete(
     messages: ChatMessage[],
-    task: AITask = 'chat',
+    _task: AITask = 'chat',
     temperature = 0.7,
     maxTokens = 1024,
   ): Promise<{ content: string }> {
+    const model = this.selector.pick()
+    const start = Date.now()
     try {
-      const model = this.modelConfig[task] ?? this.modelConfig.chat
       const response = await this.client.chat.completions.create({
         model,
         messages,
         temperature,
         max_tokens: maxTokens,
       })
+      this.selector.record(model, Date.now() - start)
       return { content: response.choices[0]?.message?.content ?? '' }
     } catch (error) {
+      this.selector.recordError(model)
       throw new AIProviderError(`OpenRouter error: ${(error as Error).message}`)
     }
   }
@@ -44,7 +45,7 @@ export class OpenRouterProvider implements AIProvider {
   async embed(text: string): Promise<number[]> {
     try {
       const response = await this.client.embeddings.create({
-        model: this.modelConfig.embedding,
+        model: 'text-embedding-3-small',
         input: text,
       })
       return response.data[0].embedding

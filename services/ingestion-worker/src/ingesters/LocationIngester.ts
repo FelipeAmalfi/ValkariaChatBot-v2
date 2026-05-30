@@ -1,5 +1,6 @@
 import type { Pool } from 'pg'
 import type { LocationRow } from '../parsers/CsvParser.js'
+import { normalizeLocationName } from '../parsers/CsvParser.js'
 
 export class LocationIngester {
   constructor(private pool: Pool) {}
@@ -12,17 +13,26 @@ export class LocationIngester {
         ? row.services.split(',').map((s) => s.trim()).filter(Boolean)
         : []
 
+      const metadata = {
+        short_description: row.short_description ?? '',
+        honors: row.honors ?? '',
+        npcs: row.npcs ? row.npcs.split('|').map(s => s.trim()).filter(Boolean) : [],
+      }
+
       const { rows: result } = await this.pool.query<{ id: string }>(
-        `INSERT INTO locations (name, description, services)
-         VALUES ($1, $2, $3)
+        `INSERT INTO locations (name, description, services, metadata)
+         VALUES ($1, $2, $3, $4)
          ON CONFLICT (name) DO UPDATE
            SET description = EXCLUDED.description,
-               services    = EXCLUDED.services
+               services    = EXCLUDED.services,
+               metadata    = EXCLUDED.metadata
          RETURNING id`,
-        [row.name, row.description, services]
+        [row.name, row.full_description ?? row.short_description, services, JSON.stringify(metadata)]
       )
 
-      locationMap[row.name] = result[0].id
+      const id = result[0].id
+      locationMap[row.name] = id
+      locationMap[normalizeLocationName(row.name)] = id
     }
 
     return locationMap

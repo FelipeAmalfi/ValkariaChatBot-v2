@@ -22,7 +22,6 @@ export const GET_PLAYER_AFFINITIES = gql`
       level
       score
       interactionCount
-      lastInteraction
     }
   }
 `

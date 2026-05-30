@@ -1,28 +1,33 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useMutation } from '@apollo/client/react'
 import { useAuth } from '@/lib/auth/AuthContext'
-import { AUTHENTICATE_DM } from '@/lib/graphql/mutations/auth'
 
 export default function DMLoginPage() {
   const router = useRouter()
   const { loginAsDM } = useAuth()
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
-
-  const [authenticateDM, { loading }] = useMutation(AUTHENTICATE_DM)
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
+    setLoading(true)
     try {
-      const { data } = await authenticateDM({ variables: { password } })
-      const result = data as { authenticateDM: { token: string } }
-      loginAsDM(result.authenticateDM.token)
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/dm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      })
+      if (!res.ok) throw new Error('unauthorized')
+      const data = await res.json() as { token: string }
+      loginAsDM(data.token)
       router.push('/dm')
     } catch {
       setError('Senha incorreta.')
+    } finally {
+      setLoading(false)
     }
   }
 

@@ -44,14 +44,7 @@ export function buildContainer(env: Env): AuthBuildResult {
   const playerRepo = new PgPlayerRepository(pool)
   const challengeStore = new AuthChallengeStore(redis)
 
-  const aiProvider = new OpenRouterProvider(env.OPENROUTER_API_KEY, {
-    chat: 'mistralai/mistral-7b-instruct:free',
-    classification: env.AI_CLASSIFICATION_MODEL ?? 'mistralai/mistral-7b-instruct:free',
-    embedding: env.AI_EMBEDDING_MODEL ?? 'text-embedding-3-small',
-    cypher: 'mistralai/mistral-7b-instruct:free',
-    plan: 'mistralai/mistral-7b-instruct:free',
-    summarization: 'mistralai/mistral-7b-instruct:free',
-  })
+  const aiProvider = new OpenRouterProvider(env.OPENROUTER_API_KEY)
 
   const threshold = parseFloat(env.SEMANTIC_AUTH_THRESHOLD)
   const semanticAuth = new EmbeddingSemanticAuth(aiProvider, threshold)

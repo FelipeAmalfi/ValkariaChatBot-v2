@@ -1,18 +1,22 @@
 import type { Pool } from 'pg'
 import type { NpcRow } from '../parsers/CsvParser.js'
+import { normalizeLocationName } from '../parsers/CsvParser.js'
 
 export class NpcIngester {
   constructor(private pool: Pool) {}
 
   async ingest(rows: NpcRow[], locationMap: Record<string, string>): Promise<void> {
     for (const row of rows) {
-      const locationId = locationMap[row.location] ?? null
+      const locationId =
+        locationMap[row.location] ??
+        locationMap[normalizeLocationName(row.location)] ??
+        null
 
       const likes = row.likes
-        ? row.likes.split(',').map((s) => s.trim()).filter(Boolean)
+        ? row.likes.split('|').map((s) => s.trim()).filter(Boolean)
         : []
       const dislikes = row.dislikes
-        ? row.dislikes.split(',').map((s) => s.trim()).filter(Boolean)
+        ? row.dislikes.split('|').map((s) => s.trim()).filter(Boolean)
         : []
 
       const metadata = {

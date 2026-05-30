@@ -27,6 +27,8 @@ export class EmbeddingSemanticAuth {
 
   async validate(answer: string, storedEmbedding: number[]): Promise<boolean> {
     const answerEmbedding = await this.aiProvider.embed(answer)
-    return cosineSimilarity(answerEmbedding, storedEmbedding) >= this.threshold
+    const score = cosineSimilarity(answerEmbedding, storedEmbedding)
+    console.log(`[semantic-auth] similarity=${score.toFixed(4)} threshold=${this.threshold} pass=${score >= this.threshold}`)
+    return score >= this.threshold
   }
 }

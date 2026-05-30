@@ -1,6 +1,24 @@
 import type { ValkáriaState } from '../state.js'
 import type { GraphDependencies } from '../dependencies.js'
 
+async function buildWorldFacts(deps: GraphDependencies): Promise<string> {
+  const [locations, characters] = await Promise.all([
+    deps.locationRepository.findMany().catch(() => []),
+    deps.characterRepository.findMany().catch(() => []),
+  ])
+
+  const locationList = locations.map(l => `- ${l.name}: ${l.description ?? ''}`).join('\n')
+  const characterList = characters.map(c => `- ${c.name} (${c.faction ?? 'sem facção'}): ${c.description ?? ''}`).join('\n')
+
+  return `=== FONTE DA VERDADE — LOCAIS EXISTENTES ===
+${locationList || '(nenhum)'}
+
+=== FONTE DA VERDADE — NPCs EXISTENTES ===
+${characterList || '(nenhum)'}
+
+REGRA ABSOLUTA: Você JAMAIS deve inventar ou mencionar locais, NPCs ou facções que não constem nas listas acima. Se perguntado sobre algo que não existe nessas listas, diga que não há registros desse lugar ou personagem em Valkária.`
+}
+
 async function buildSystemPrompt(state: ValkáriaState, deps: GraphDependencies): Promise<string> {
   const role = state.sessionContext?.role ?? null
   const threadId = state.sessionContext?.threadId
@@ -13,6 +31,7 @@ async function buildSystemPrompt(state: ValkáriaState, deps: GraphDependencies)
   }
 
   const recentContext = state.sessionContext?.recentContext.slice(-3).join('\n') ?? ''
+  const worldFacts = await buildWorldFacts(deps)
 
   const roleInstruction = role === 'DM'
     ? 'O usuário é o Mestre do Jogo (DM). Forneça informações completas e detalhadas, incluindo dados de bastidores, pontuações de afinidade e informações confidenciais dos NPCs.'
@@ -25,6 +44,8 @@ Responda SEMPRE em português brasileiro.
 Mantenha um tom narrativo de RPG, evocativo e imersivo.
 
 ${roleInstruction}
+
+${worldFacts}
 
 ${memorySummary ? `Contexto da memória: ${memorySummary.slice(0, 300)}` : ''}
 ${recentContext ? `Contexto recente:\n${recentContext}` : ''}`

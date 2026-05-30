@@ -1,10 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useMutation } from '@apollo/client/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/lib/auth/AuthContext'
-import { INITIATE_AUTH, VERIFY_AUTH } from '@/lib/graphql/mutations/auth'
 
 type Phase = 'name' | 'challenge' | 'result'
 
@@ -24,44 +22,56 @@ export function LoginChallenge() {
   const [challenge, setChallenge] = useState<Challenge | null>(null)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [initiating, setInitiating] = useState(false)
+  const [verifying, setVerifying] = useState(false)
 
   useEffect(() => {
     const name = searchParams.get('name')
     if (name) setPlayerName(name)
   }, [searchParams])
 
-  const [initiateAuth, { loading: initiating }] = useMutation(INITIATE_AUTH)
-  const [verifyAuth, { loading: verifying }] = useMutation(VERIFY_AUTH)
-
   async function handleInitiate() {
     if (!playerName.trim()) { setError('Digite seu nome.'); return }
     setError(null)
+    setInitiating(true)
     try {
-      const { data } = await initiateAuth({ variables: { playerName: playerName.trim() } })
-      const initResult = data as { initiatePlayerAuth: Challenge }
-      setChallenge(initResult.initiatePlayerAuth)
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/initiate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerName: playerName.trim() }),
+      })
+      if (!res.ok) throw new Error('not found')
+      const data = await res.json() as Challenge
+      setChallenge(data)
       setPhase('challenge')
     } catch {
       setError('Personagem não encontrado. Verifique o nome.')
+    } finally {
+      setInitiating(false)
     }
   }
 
   async function handleVerify() {
     if (!answer.trim() || !challenge) return
     setError(null)
+    setVerifying(true)
     try {
-      const { data } = await verifyAuth({
-        variables: { challengeId: challenge.challengeId, answer: answer.trim() },
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/validate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ challengeId: challenge.challengeId, answer: answer.trim() }),
       })
-      const verifyResult = data as { verifyPlayerAuth: { token: string; player: { id: string; name: string; class: string; race: string } } }
-      const { token, player } = verifyResult.verifyPlayerAuth
-      login(token, player)
+      if (!res.ok) throw new Error('invalid')
+      const data = await res.json() as { token: string; player: { id: string; name: string; class: string; race: string } }
+      login(data.token, data.player)
       setSuccess(true)
       setPhase('result')
       setTimeout(() => router.push('/chat'), 800)
     } catch {
       setPhase('result')
       setSuccess(false)
+    } finally {
+      setVerifying(false)
     }
   }
 

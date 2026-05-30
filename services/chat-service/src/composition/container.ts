@@ -45,7 +45,7 @@ export async function createContainer() {
   const checkpointer = new PostgresSaver(pgPool)
   await checkpointer.setup()
 
-  const aiProvider = new OpenRouterProvider(openRouterKey, buildModelMap())
+  const aiProvider = new OpenRouterProvider(openRouterKey)
 
   const vectorRetriever = new PgVectorRetriever(pgPool)
 

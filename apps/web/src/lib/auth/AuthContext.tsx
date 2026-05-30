@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (stored) {
       const claims = parseJwtClaims(stored)
       setToken(stored)
-      setIsDM(claims.role === 'dm')
+      setIsDM(claims.role === 'DM')
       if (claims.player && typeof claims.player === 'object') {
         setPlayer(claims.player as Player)
       }
