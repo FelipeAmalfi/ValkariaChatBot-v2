@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "dev": "tsx src/pipeline.ts",
+    "dev": "sh -c 'set -a && . ../../.env && set +a && tsx src/pipeline.ts'",
     "test": "vitest run"
   },
   "dependencies": {

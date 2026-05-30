@@ -1,4 +1,5 @@
 import { readdir, readFile } from 'fs/promises'
+import { existsSync } from 'fs'
 import { join } from 'path'
 import { Pool } from 'pg'
 
@@ -10,7 +11,8 @@ export async function runMigrations(pool: Pool): Promise<void> {
     )
   `)
 
-  const migrationsDir = join(__dirname, 'migrations')
+  const distMigrations = join(__dirname, 'migrations')
+  const migrationsDir = existsSync(distMigrations) ? distMigrations : join(__dirname, '../src/migrations')
   const files = (await readdir(migrationsDir)).filter(f => f.endsWith('.sql')).sort()
 
   for (const file of files) {
