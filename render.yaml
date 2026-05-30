@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: valkaria-auth
+    runtime: docker
+    dockerfilePath: services/auth-service/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: AUTH_PORT
+        fromService: { type: web, name: valkaria-auth, envVarKey: PORT }
+
+  - type: web
+    name: valkaria-chat
+    runtime: docker
+    dockerfilePath: services/chat-service/Dockerfile
+    dockerContext: .
+
+  - type: web
+    name: valkaria-world
+    runtime: docker
+    dockerfilePath: services/world-service/Dockerfile
+    dockerContext: .
