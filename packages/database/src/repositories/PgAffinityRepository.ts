@@ -59,7 +59,7 @@ export class PgAffinityRepository implements AffinityRepository {
   async updateScore(id: string, delta: number): Promise<AffinityEntry> {
     const { rows } = await this.pool.query(
       `UPDATE npc_affinity
-       SET score = GREATEST(0, LEAST(100, score + $2)),
+       SET score = GREATEST(0, LEAST(7, score + $2)),
            interaction_count = interaction_count + 1,
            last_interaction = NOW()
        WHERE id = $1

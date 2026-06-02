@@ -6,6 +6,7 @@ export interface Player {
   background: string
   personality: string
   interests: string
+  avatarUrl?: string
   createdAt: string
   updatedAt: string
 }

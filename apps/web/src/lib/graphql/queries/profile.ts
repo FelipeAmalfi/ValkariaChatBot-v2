@@ -23,7 +23,6 @@ export const GET_NPC_DETAILS = gql`
   query GetNpcDetails($name: String!) {
     npc(name: $name) {
       name
-      faction
       role
       location
       metadata {
@@ -31,6 +30,17 @@ export const GET_NPC_DETAILS = gql`
         benefitsLoyal
         benefitsIntimate
       }
+    }
+  }
+`
+
+export const SET_AFFINITY = gql`
+  mutation SetAffinity($playerName: String!, $npcName: String!, $score: Int!) {
+    setAffinity(playerName: $playerName, npcName: $npcName, score: $score) {
+      npcName
+      level
+      score
+      interactionCount
     }
   }
 `

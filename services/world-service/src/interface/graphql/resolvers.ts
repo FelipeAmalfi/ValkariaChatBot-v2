@@ -9,6 +9,7 @@ import type { ListLocationsUseCase } from '../../application/use-cases/ListLocat
 import type { GetAffinityUseCase } from '../../application/use-cases/GetAffinityUseCase.js'
 import type { ListAffinitiesUseCase } from '../../application/use-cases/ListAffinitiesUseCase.js'
 import type { UpdateAffinityUseCase } from '../../application/use-cases/UpdateAffinityUseCase.js'
+import type { SetAffinityUseCase } from '../../application/use-cases/SetAffinityUseCase.js'
 import type { ListPlayersUseCase } from '../../application/use-cases/ListPlayersUseCase.js'
 import './context.js'
 
@@ -20,6 +21,7 @@ interface UseCases {
   getAffinity: GetAffinityUseCase
   listAffinities: ListAffinitiesUseCase
   updateAffinity: UpdateAffinityUseCase
+  setAffinity: SetAffinityUseCase
   listPlayers: ListPlayersUseCase
   locationRepo: LocationRepository
 }
@@ -30,7 +32,7 @@ export function createResolvers(useCases: UseCases) {
       npc: (_: unknown, { name }: { name: string }) =>
         useCases.getCharacter.execute(name),
 
-      npcs: (_: unknown, args: { location?: string; faction?: string; page?: number; pageSize?: number }) =>
+      npcs: (_: unknown, args: { location?: string; page?: number; pageSize?: number }) =>
         useCases.listCharacters.execute(args),
 
       location: (_: unknown, { name }: { name: string }) =>
@@ -54,6 +56,8 @@ export function createResolvers(useCases: UseCases) {
     Mutation: {
       updateAffinity: (_: unknown, args: { playerName: string; npcName: string; score: number }) =>
         useCases.updateAffinity.execute(args),
+      setAffinity: (_: unknown, args: { playerName: string; npcName: string; score: number }) =>
+        useCases.setAffinity.execute(args),
     },
 
     Npc: {

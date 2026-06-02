@@ -3,5 +3,6 @@ CREATE TABLE IF NOT EXISTS locations (
   name VARCHAR(255) UNIQUE NOT NULL,
   description TEXT,
   services TEXT[],
+  metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );

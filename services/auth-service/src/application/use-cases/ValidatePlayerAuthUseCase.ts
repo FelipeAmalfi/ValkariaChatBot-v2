@@ -31,8 +31,18 @@ export class ValidatePlayerAuthUseCase {
       playerId: player.id,
       playerName: player.name,
       role: 'PLAYER',
+      player: {
+        id: player.id,
+        name: player.name,
+        class: player.class,
+        race: player.race,
+        background: player.background,
+        personality: player.personality,
+        interests: player.interests,
+        avatarUrl: player.avatarUrl,
+      },
     })
 
-    return { token }
+    return { token, player }
   }
 }

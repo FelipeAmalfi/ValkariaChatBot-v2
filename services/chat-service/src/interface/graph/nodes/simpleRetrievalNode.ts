@@ -1,10 +1,10 @@
 import type { ValkáriaState } from '../state.js'
 import type { GraphDependencies } from '../dependencies.js'
-import type { Character } from '@valkaria/domain'
+import type { Character, AffinityEntry } from '@valkaria/domain'
 import type { Location } from '@valkaria/domain'
 
 function formatCharacter(character: Character): string {
-  const lines: string[] = [`${character.name} é um(a) ${character.faction}.`]
+  const lines: string[] = [`${character.name} é um(a) ${character.role}.`]
   if (character.description) lines.push(character.description)
   if (character.metadata.likes?.length) {
     lines.push(`Gosta de: ${character.metadata.likes.join(', ')}.`)
@@ -24,15 +24,46 @@ function formatLocation(location: Location): string {
   return lines.join('\n')
 }
 
-function formatBenefits(character: Character): string {
+const LEVEL_ORDER = ['none', 'cordial', 'loyal', 'intimate'] as const
+type AffinityLevel = typeof LEVEL_ORDER[number]
+
+function levelUnlocks(current: AffinityLevel, required: AffinityLevel): boolean {
+  return LEVEL_ORDER.indexOf(current) >= LEVEL_ORDER.indexOf(required)
+}
+
+function formatBenefits(character: Character, affinity: AffinityEntry | null): string {
   const m = character.metadata
-  const parts = [
-    m.benefits_cordial ? `Cordial: ${m.benefits_cordial}` : null,
-    m.benefits_loyal ? `Leal: ${m.benefits_loyal}` : null,
-    m.benefits_intimate ? `Íntimo: ${m.benefits_intimate}` : null,
-  ].filter((p): p is string => p !== null)
-  if (!parts.length) return `${character.name} não possui benefícios registrados.`
-  return `Benefícios de ${character.name}:\n${parts.join('\n')}`
+  const currentLevel = (affinity?.level ?? 'none') as AffinityLevel
+  const score = affinity?.score ?? 0
+  const interactionCount = affinity?.interactionCount ?? 0
+
+  const levelLabel: Record<AffinityLevel, string> = {
+    none: 'Neutro',
+    cordial: 'Cordial',
+    loyal: 'Leal',
+    intimate: 'Íntimo',
+  }
+
+  const benefitLines = [
+    { key: 'cordial' as AffinityLevel, label: 'Cordial', text: m.benefits_cordial },
+    { key: 'loyal' as AffinityLevel, label: 'Leal', text: m.benefits_loyal },
+    { key: 'intimate' as AffinityLevel, label: 'Íntimo', text: m.benefits_intimate },
+  ]
+    .filter(b => b.text)
+    .map(b => {
+      const unlocked = levelUnlocks(currentLevel, b.key)
+      const status = unlocked ? '[DESBLOQUEADO]' : '[BLOQUEADO]'
+      return `${b.label} ${status}: ${b.text}`
+    })
+
+  if (!benefitLines.length) return `${character.name} não possui benefícios registrados.`
+
+  return [
+    `Benefícios de ${character.name}:`,
+    `Afinidade atual do jogador: ${levelLabel[currentLevel]} (pontos: ${score.toFixed(0)}, interações: ${interactionCount})`,
+    '',
+    ...benefitLines,
+  ].join('\n')
 }
 
 export async function simpleRetrievalNode(
@@ -72,7 +103,11 @@ export async function simpleRetrievalNode(
     } else if (intent === 'ask_benefits' && slots.characterName) {
       const character = await deps.characterRepository.findByName(String(slots.characterName))
       if (character) {
-        retrievedContext = formatBenefits(character)
+        const playerId = state.sessionContext?.playerId ?? null
+        const affinity = playerId
+          ? await deps.affinityRepository.findByPlayerAndNpc(playerId, character.name).catch(() => null)
+          : null
+        retrievedContext = formatBenefits(character, affinity)
       }
     }
 

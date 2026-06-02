@@ -4,7 +4,6 @@ export const GET_NPC = gql`
   query GetNpc($name: String!) {
     npc(name: $name) {
       name
-      faction
       role
       location
       metadata {

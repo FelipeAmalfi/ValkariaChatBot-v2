@@ -1,7 +1,7 @@
 export const typeDefs = `
   type Query {
     npc(name: String!): Npc
-    npcs(location: String, faction: String, page: Int, pageSize: Int): [Npc!]!
+    npcs(location: String, page: Int, pageSize: Int): [Npc!]!
     location(name: String!): Location
     locations(page: Int, pageSize: Int): [Location!]!
     affinity(playerName: String!, npcName: String!): AffinityEntry
@@ -11,6 +11,7 @@ export const typeDefs = `
 
   type Mutation {
     updateAffinity(playerName: String!, npcName: String!, score: Float!): AffinityEntry!
+    setAffinity(playerName: String!, npcName: String!, score: Int!): AffinityEntry!
   }
 
   type Npc {
@@ -18,7 +19,6 @@ export const typeDefs = `
     name: String!
     description: String
     role: String!
-    faction: String!
     location: String
     metadata: NpcMetadata
   }

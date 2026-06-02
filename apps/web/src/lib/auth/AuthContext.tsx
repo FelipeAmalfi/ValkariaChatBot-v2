@@ -9,12 +9,14 @@ interface Player {
   background?: string
   personality?: string
   interests?: string
+  avatarUrl?: string
 }
 
 interface AuthState {
   token: string | null
   player: Player | null
   isDM: boolean
+  hydrated: boolean
   login: (token: string, player?: Player) => void
   loginAsDM: (token: string) => void
   logout: () => void
@@ -24,6 +26,7 @@ const AuthContext = createContext<AuthState>({
   token: null,
   player: null,
   isDM: false,
+  hydrated: false,
   login: () => {},
   loginAsDM: () => {},
   logout: () => {},
@@ -42,6 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null)
   const [player, setPlayer] = useState<Player | null>(null)
   const [isDM, setIsDM] = useState(false)
+  const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
     const stored = localStorage.getItem('valkaria:token')
@@ -53,6 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setPlayer(claims.player as Player)
       }
     }
+    setHydrated(true)
   }, [])
 
   const login = useCallback((newToken: string, newPlayer?: Player) => {
@@ -84,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ token, player, isDM, login, loginAsDM, logout }}>
+    <AuthContext.Provider value={{ token, player, isDM, hydrated, login, loginAsDM, logout }}>
       {children}
     </AuthContext.Provider>
   )

@@ -11,18 +11,8 @@ interface ListLocationsData {
   locations: Location[]
 }
 
-const FACTIONS = [
-  { value: '', label: 'Todas' },
-  { value: 'valkaria_order', label: 'Ordem de Valkária' },
-  { value: 'shadow_guild', label: 'Guilda das Sombras' },
-  { value: 'merchant_league', label: 'Liga Mercante' },
-  { value: 'free_cities', label: 'Cidades Livres' },
-  { value: 'neutral', label: 'Neutro' },
-]
-
 interface FilterValue {
   location: string
-  faction: string
   page: number
 }
 
@@ -36,35 +26,12 @@ export function NpcFilter({ value, onChange }: NpcFilterProps) {
     variables: { pageSize: 50 },
   })
 
-  function handleFaction(faction: string) {
-    onChange({ ...value, faction, page: 1 })
-  }
-
   function handleLocation(location: string) {
     onChange({ ...value, location, page: 1 })
   }
 
   return (
     <aside className="w-48 shrink-0 space-y-4">
-      <div>
-        <label className="text-silver text-xs uppercase tracking-wider mb-2 block">Facção</label>
-        <div className="space-y-1">
-          {FACTIONS.map(f => (
-            <button
-              key={f.value}
-              onClick={() => handleFaction(f.value)}
-              className={`w-full text-left px-3 py-1.5 text-sm rounded transition-colors ${
-                value.faction === f.value
-                  ? 'bg-shadow text-parchment'
-                  : 'text-silver hover:bg-shadow/50 hover:text-parchment'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
       <div>
         <label className="text-silver text-xs uppercase tracking-wider mb-2 block">Local</label>
         <select

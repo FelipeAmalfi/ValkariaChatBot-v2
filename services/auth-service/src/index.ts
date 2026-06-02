@@ -33,9 +33,9 @@ function getEnv() {
 const env = getEnv()
 const port = parseInt(env.AUTH_PORT, 10)
 
-const { deps, pool, redis } = buildContainer(env)
+const { deps, playerDeps, pool, redis } = buildContainer(env)
 
-createServer(deps, pool, redis).then((app) => {
+createServer(deps, playerDeps, pool, redis).then((app) => {
   app.listen({ port, host: '0.0.0.0' }, (err) => {
     if (err) {
       console.error(err)

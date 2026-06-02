@@ -1,6 +1,5 @@
 export const CANDIDATE_MODELS = [
   'openrouter/owl-alpha',
-  'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
   'poolside/laguna-xs.2:free',
 ]
 

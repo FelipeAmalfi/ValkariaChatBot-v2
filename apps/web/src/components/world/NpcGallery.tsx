@@ -8,13 +8,11 @@ import { NpcGalleryCard } from './NpcGalleryCard'
 
 interface Filters {
   location: string
-  faction: string
   page: number
 }
 
 interface Npc {
   name: string
-  faction: string
   role: string
   location?: string
 }
@@ -34,7 +32,7 @@ interface GetAffinitiesData {
 }
 
 export function NpcGallery() {
-  const [filters, setFilters] = useState<Filters>({ location: '', faction: '', page: 1 })
+  const [filters, setFilters] = useState<Filters>({ location: '', page: 1 })
   const { player } = useAuth()
 
   const { data: npcsData, loading } = useQuery<ListNpcsData>(LIST_NPCS, {

@@ -13,6 +13,7 @@ import { ListLocationsUseCase } from '../application/use-cases/ListLocationsUseC
 import { GetAffinityUseCase } from '../application/use-cases/GetAffinityUseCase.js'
 import { ListAffinitiesUseCase } from '../application/use-cases/ListAffinitiesUseCase.js'
 import { UpdateAffinityUseCase } from '../application/use-cases/UpdateAffinityUseCase.js'
+import { SetAffinityUseCase } from '../application/use-cases/SetAffinityUseCase.js'
 import { ListPlayersUseCase } from '../application/use-cases/ListPlayersUseCase.js'
 
 interface Env {
@@ -28,6 +29,7 @@ export interface ContainerDeps {
   listAffinities: ListAffinitiesUseCase
   updateAffinity: UpdateAffinityUseCase
   listPlayers: ListPlayersUseCase
+  setAffinity: SetAffinityUseCase
   locationRepo: PgLocationRepository
 }
 
@@ -54,6 +56,7 @@ export function buildContainer(env: Env): WorldBuildResult {
       listAffinities: new ListAffinitiesUseCase(affinityRepo, playerRepo),
       updateAffinity: new UpdateAffinityUseCase(affinityRepo, playerRepo),
       listPlayers: new ListPlayersUseCase(playerRepo),
+      setAffinity: new SetAffinityUseCase(affinityRepo, playerRepo),
       locationRepo,
     },
     pool,

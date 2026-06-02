@@ -2,7 +2,6 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { NpcGallery } from './NpcGallery'
 import { LocationBrowser } from './LocationBrowser'
-import { FactionOverview } from './FactionOverview'
 
 export function WorldExplorer() {
   return (
@@ -14,7 +13,6 @@ export function WorldExplorer() {
         <TabsList className="bg-night border border-shadow mb-6">
           <TabsTrigger value="npcs">Personagens</TabsTrigger>
           <TabsTrigger value="locations">Locais</TabsTrigger>
-          <TabsTrigger value="factions">Facções</TabsTrigger>
         </TabsList>
 
         <TabsContent value="npcs">
@@ -22,9 +20,6 @@ export function WorldExplorer() {
         </TabsContent>
         <TabsContent value="locations">
           <LocationBrowser />
-        </TabsContent>
-        <TabsContent value="factions">
-          <FactionOverview />
         </TabsContent>
       </Tabs>
     </div>

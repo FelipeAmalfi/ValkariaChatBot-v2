@@ -1,9 +1,11 @@
 import Link from 'next/link'
 import { ParticleCanvas } from '@/components/background/ParticleCanvas'
+import { AuthRedirect } from '@/components/home/AuthRedirect'
 
 export default function HomePage() {
   return (
     <div className="relative min-h-[calc(100vh-3.5rem)]">
+      <AuthRedirect />
       <ParticleCanvas />
 
       {/* Hero */}

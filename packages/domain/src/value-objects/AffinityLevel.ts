@@ -2,7 +2,7 @@ export type AffinityLevel = 'none' | 'cordial' | 'loyal' | 'intimate'
 
 export function scoreToLevel(score: number): AffinityLevel {
   if (score <= 0)  return 'none'
-  if (score <= 25) return 'cordial'
-  if (score <= 75) return 'loyal'
+  if (score <= 3)  return 'cordial'
+  if (score <= 6)  return 'loyal'
   return 'intimate'
 }

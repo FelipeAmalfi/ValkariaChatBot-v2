@@ -4,12 +4,12 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from './AuthContext'
 
 export function useRequireAuth() {
-  const { token } = useAuth()
+  const { token, hydrated } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (!token) router.push('/auth/login')
-  }, [token, router])
+    if (hydrated && !token) router.push('/auth/login')
+  }, [token, hydrated, router])
 
   return !!token
 }

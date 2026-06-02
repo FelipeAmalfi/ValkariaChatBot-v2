@@ -14,7 +14,6 @@ interface NpcMetadata {
 interface NpcCardProps {
   npc: {
     name: string
-    faction: string
     role: string
     location?: string
     metadata?: NpcMetadata
@@ -22,19 +21,8 @@ interface NpcCardProps {
   affinity?: { level: string; score: number }
 }
 
-const FACTION_COLORS: Record<string, string> = {
-  'Guarda Real':     'bg-gold/20 text-gold border-gold/40',
-  'Círculo Arcano':  'bg-valkaria-500/20 text-valkaria-300 border-valkaria-500/40',
-  'Mercadores':      'bg-sage/20 text-sage border-sage/40',
-  'Culto das Sombras': 'bg-ember/20 text-ember border-ember/40',
-}
-
-const DEFAULT_FACTION_COLOR = 'bg-mist/20 text-silver border-mist/40'
-
 export function NpcCard({ npc, affinity }: NpcCardProps) {
   const [expanded, setExpanded] = useState(false)
-
-  const factionColor = FACTION_COLORS[npc.faction] ?? DEFAULT_FACTION_COLOR
 
   const currentBenefit = affinity
     ? ({
@@ -50,17 +38,11 @@ export function NpcCard({ npc, affinity }: NpcCardProps) {
 
   return (
     <div className="p-4 space-y-3">
-      {/* Name + faction */}
       <div className="space-y-2">
         <h3 className="text-gold font-display text-lg leading-tight">{npc.name}</h3>
-        <div className="flex flex-wrap gap-2">
-          <span className={cn('text-xs px-2 py-0.5 rounded-full border', factionColor)}>
-            {npc.faction}
-          </span>
-          <span className="text-xs px-2 py-0.5 rounded-full border bg-shadow/30 text-silver border-shadow">
-            {npc.role}
-          </span>
-        </div>
+        <span className="text-xs px-2 py-0.5 rounded-full border bg-shadow/30 text-silver border-shadow">
+          {npc.role}
+        </span>
       </div>
 
       {/* Location */}
@@ -75,7 +57,7 @@ export function NpcCard({ npc, affinity }: NpcCardProps) {
       {affinity && (
         <div className="space-y-1">
           <p className="text-xs text-silver/50 uppercase tracking-wider">Afinidade</p>
-          <AffinityMeter level={affinity.level} />
+          <AffinityMeter level={affinity.level} score={affinity.score} />
         </div>
       )}
 

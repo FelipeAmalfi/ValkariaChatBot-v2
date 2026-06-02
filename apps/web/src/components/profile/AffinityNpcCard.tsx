@@ -19,7 +19,6 @@ export function AffinityNpcCard({ npcName, level, score, interactionCount }: Aff
   const [fetchDetails, { data }] = useLazyQuery<{
     npc: {
       name: string
-      faction: string
       role: string
       location: string
       metadata: { benefitsCordial: string; benefitsLoyal: string; benefitsIntimate: string }
@@ -51,7 +50,7 @@ export function AffinityNpcCard({ npcName, level, score, interactionCount }: Aff
         <span className="text-mist/50 text-xs">{interactionCount} interações</span>
       </div>
       <div className="mt-2">
-        <AffinityMeter level={level} />
+        <AffinityMeter level={level} score={score} />
       </div>
 
       <AnimatePresence>

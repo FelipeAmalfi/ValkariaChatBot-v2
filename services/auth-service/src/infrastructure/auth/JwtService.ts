@@ -2,10 +2,22 @@ import jwt from 'jsonwebtoken'
 
 export type JwtRole = 'PLAYER' | 'DM'
 
+export interface JwtPlayerData {
+  id: string
+  name: string
+  class: string
+  race: string
+  background: string
+  personality: string
+  interests: string
+  avatarUrl?: string
+}
+
 export interface JwtPayload {
   playerId?: string
   playerName?: string
   role: JwtRole
+  player?: JwtPlayerData
 }
 
 export class JwtService {

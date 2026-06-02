@@ -10,6 +10,7 @@ import { InitiatePlayerAuthUseCase } from '../application/use-cases/InitiatePlay
 import { ValidatePlayerAuthUseCase } from '../application/use-cases/ValidatePlayerAuthUseCase.js'
 import { AuthenticateDMUseCase } from '../application/use-cases/AuthenticateDMUseCase.js'
 import type { AuthControllerDeps } from '../interface/http/controllers/AuthController.js'
+import type { PlayerControllerDeps } from '../interface/http/controllers/PlayerController.js'
 
 interface Env {
   DATABASE_URL: string
@@ -33,6 +34,7 @@ function parseExpiryToSeconds(value: string): number {
 
 export interface AuthBuildResult {
   deps: AuthControllerDeps
+  playerDeps: Omit<PlayerControllerDeps, 'uploadsDir' | 'apiUrl'>
   pool: Pool
   redis: Redis
 }
@@ -57,6 +59,7 @@ export function buildContainer(env: Env): AuthBuildResult {
       validatePlayerAuth: new ValidatePlayerAuthUseCase(playerRepo, semanticAuth, challengeStore, jwtService),
       authenticateDM: new AuthenticateDMUseCase(jwtService, env.DM_PASSWORD),
     },
+    playerDeps: { playerRepo, jwtService },
     pool,
     redis,
   }

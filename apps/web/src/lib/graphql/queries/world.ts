@@ -1,10 +1,9 @@
 import { gql } from '@apollo/client'
 
 export const LIST_NPCS = gql`
-  query ListNpcs($location: String, $faction: String, $page: Int, $pageSize: Int) {
-    npcs(location: $location, faction: $faction, page: $page, pageSize: $pageSize) {
+  query ListNpcs($location: String, $page: Int, $pageSize: Int) {
+    npcs(location: $location, page: $page, pageSize: $pageSize) {
       name
-      faction
       role
       location
     }
@@ -28,6 +27,7 @@ export const GET_AFFINITIES = gql`
       npcName
       level
       score
+      interactionCount
     }
   }
 `

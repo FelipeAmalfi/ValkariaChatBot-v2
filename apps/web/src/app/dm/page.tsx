@@ -5,14 +5,15 @@ import { useAuth } from '@/lib/auth/AuthContext'
 import { DmDashboard } from '@/components/dm/DmDashboard'
 
 export default function DmPage() {
-  const { isDM, token } = useAuth()
+  const { isDM, token, hydrated } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
+    if (!hydrated) return
     if (token && !isDM) router.push('/chat')
     if (!token) router.push('/auth/dm')
-  }, [token, isDM, router])
+  }, [token, isDM, hydrated, router])
 
-  if (!isDM) return null
+  if (!hydrated || !isDM) return null
   return <DmDashboard />
 }

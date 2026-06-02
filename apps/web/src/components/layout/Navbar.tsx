@@ -5,12 +5,13 @@ import { useAuth } from '@/lib/auth/AuthContext'
 export function Navbar() {
   const { player, isDM, token, logout } = useAuth()
   const isAuthenticated = !!token
+  const logoHref = !token ? '/' : isDM ? '/dm' : '/chat'
 
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-sm bg-void/80 border-b border-shadow">
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="font-display text-gold text-lg font-semibold tracking-wide">
+        <Link href={logoHref} className="font-display text-gold text-lg font-semibold tracking-wide">
           ⚔ Valkária
         </Link>
 
